@@ -9,7 +9,7 @@ async function runBot() {
  await agent.login({
   identifier: process.env.BSKY_USERNAME || '',
   password: process.env.BSKY_PASSWORD || '',
-});
+ });
 
 
   const notifs = await agent.getNotifications();
