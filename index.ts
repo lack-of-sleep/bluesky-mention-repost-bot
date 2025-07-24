@@ -1,17 +1,16 @@
 import { BskyAgent } from '@atproto/api';
-import dotenv from 'dotenv';
 
-dotenv.config();
 
 const agent = new BskyAgent({ service: 'https://bsky.social' });
 
 const handled = new Set<string>();
 
 async function runBot() {
-  await agent.login({
-    identifier: process.env.BSKY_USERNAME!,
-    password: process.env.BSKY_PASSWORD!,
-  });
+ await agent.login({
+  identifier: process.env.BSKY_USERNAME || '',
+  password: process.env.BSKY_PASSWORD || '',
+});
+
 
   const notifs = await agent.getNotifications();
 
