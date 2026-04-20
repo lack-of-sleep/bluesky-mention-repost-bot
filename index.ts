@@ -1,4 +1,4 @@
-import { BskyAgent, AppBskyFeedDefs } from '@atproto/api';
+import { BskyAgent, AppBskyFeedDefs, AppBskyEmbedRecord, AppBskyEmbedRecordWithMedia } from '@atproto/api';
 import 'dotenv/config';
 import { readFileSync, writeFileSync } from 'fs';
 
@@ -63,7 +63,23 @@ async function runBot() {
         root = root.parent;
       }
 
-      await repostWithRefresh(root.post, history);
+      const embed = root.post.embed;
+      let quotedUri: string | undefined;
+
+      if (AppBskyEmbedRecord.isView(embed) && AppBskyEmbedRecord.isViewRecord(embed.record)) {
+        quotedUri = embed.record.uri;
+      } else if (AppBskyEmbedRecordWithMedia.isView(embed) && AppBskyEmbedRecord.isViewRecord(embed.record.record)) {
+        quotedUri = embed.record.record.uri;
+      }
+
+      if (quotedUri) {
+        const result = await agent.getPosts({ uris: [quotedUri] });
+        if (result.success && result.data.posts.length > 0) {
+          await repostWithRefresh(result.data.posts[0], history);
+        }
+      } else {
+        await repostWithRefresh(root.post, history);
+      }
 
     } else if (notif.reason === 'quote') {
       if (!notif.reasonSubject) continue;
