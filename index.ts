@@ -51,8 +51,9 @@ async function runBot() {
 
   const history = loadHistory();
   const notifs = await agent.listNotifications();
+  const newNotifs = notifs.data.notifications.filter(n => !n.isRead);
 
-  for (const notif of notifs.data.notifications) {
+  for (const notif of newNotifs) {
     if (notif.reason === 'mention') {
       const thread = await agent.getPostThread({ uri: notif.uri });
       if (!thread.success) continue;
@@ -72,6 +73,10 @@ async function runBot() {
 
       await repostWithRefresh(result.data.posts[0], history);
     }
+  }
+
+  if (newNotifs.length > 0) {
+    await agent.updateSeenNotifications();
   }
 
   saveHistory(history);
