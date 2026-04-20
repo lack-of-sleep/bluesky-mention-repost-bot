@@ -50,7 +50,7 @@ async function runBot() {
   });
 
   const history = loadHistory();
-  const notifs = await agent.getNotifications();
+  const notifs = await agent.listNotifications();
 
   for (const notif of notifs.data.notifications) {
     if (notif.reason === 'mention') {
